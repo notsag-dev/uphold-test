@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { getToken } from './auth/uphold';
+import { getTickers } from './usecases/getTickers';
 
 async function init() {
   dotenv.config({
@@ -15,11 +16,12 @@ async function init() {
     throw new Error('Please set uphold credentials in .env file');
   }
 
-  await getToken(
+  const token = await getToken(
     process.env.UPHOLD_API_URL,
     process.env.UPHOLD_API_CLIENT_ID,
     process.env.UPHOLD_API_SECRET
   );
+  const info = await getTickers(process.env.UPHOLD_API_URL, token);
 }
 
 init();
