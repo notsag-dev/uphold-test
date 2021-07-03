@@ -12,6 +12,7 @@
     "rollback": "knex migrate:rollback --knexfile src/knexfile.ts"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "knex": "^0.95.1",
     "pg": "^8.5.1",
