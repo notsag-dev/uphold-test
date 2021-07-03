@@ -7,6 +7,13 @@ type TickersItem = {
   pair: string;
 };
 
+export function startTickersTask(apiUrl: string, token: string) {
+  const interval = setInterval(async () => {
+    const conversion = await getTickers(apiUrl, token);
+    console.log(conversion);
+  }, 5000);
+  return interval;
+}
 export async function getTickers(apiUrl: string, token: string) {
   const { data } = await axios({
     method: 'get',
