@@ -69,7 +69,7 @@ export function buildRunTickerUsecase(
           rateDifference: compareResult.differenceWithFirst,
         });
       }
-      printResults(compareResult, debugging);
+      printResults(compareResult, currency, currencyPair, debugging);
     }, 5000);
     return recurringTask;
   }
@@ -122,30 +122,51 @@ export function compareRates(
   currentRate: number,
   lastPercentageChangeInformed: number
 ): RateCompareResult {
-  const diff = ((currentRate - firstRate) * 100) / firstRate;
-  const differenceWithFirst = +diff.toFixed(4);
+  const differenceWithFirst = ((currentRate - firstRate) * 100) / firstRate;
+  const differenceWithFirstFixed = +differenceWithFirst.toFixed(5);
   const differenceWithLastInformed =
     differenceWithFirst - lastPercentageChangeInformed;
+  const differenceWithLastInformedFixed =
+    +differenceWithLastInformed.toFixed(5);
   const inform = Math.abs(differenceWithLastInformed) >= 0.01;
 
   return {
     firstRate,
     currentRate,
-    differenceWithFirst,
-    differenceWithLastInformed,
+    differenceWithFirst: differenceWithFirstFixed,
+    differenceWithLastInformed: differenceWithLastInformedFixed,
     inform,
   };
 }
 
-function printResults(compareResult: RateCompareResult, debugging: boolean) {
+function printResults(
+  compareResult: RateCompareResult,
+  currency: string,
+  currencyPair: string,
+  debugging: boolean
+) {
+  const {
+    firstRate,
+    currentRate,
+    differenceWithFirst,
+    differenceWithLastInformed,
+  } = compareResult;
   if (compareResult.inform) {
     console.log(
-      `Conversion rate alert. BTC price changed ${compareResult.differenceWithFirst} from start value`
+      `ALERT! Price change for currency ${currency} and pair ${currencyPair}`
     );
   }
-  if (debugging) {
+  if (!compareResult.inform && debugging) {
     console.log(
-      `Not informing. Change rate since last informed was ${compareResult.differenceWithLastInformed}.`
+      `Debug: Price change not enough to trigger alert for currency ${currency} and pair ${currencyPair}`
+    );
+  }
+  if (compareResult.inform || debugging) {
+    console.log(
+      `Rate ${currentRate}. Changed ${differenceWithFirst}% from first obtained rate ${firstRate}`
+    );
+    console.log(
+      `Difference with last change that triggered an alert is ${differenceWithLastInformed}%\n`
     );
   }
 }

@@ -27,7 +27,7 @@ describe('compareRates()', () => {
     });
   });
 
-  describe('given the rate changes 0.01% and last informed difference was already 0.01%', () => {
+  describe('given the rate changes 0.01% and last informed difference was 0.01%', () => {
     it('should not inform of an oscilation', () => {
       const result = compareRates(1000, 1000.1, 0.01);
       expect(result).toStrictEqual({
@@ -40,7 +40,7 @@ describe('compareRates()', () => {
     });
   });
 
-  describe('given the rate changes 0.02% and last informed difference was already 0.01%', () => {
+  describe('given the rate changes 0.02% and last informed difference was 0.01%', () => {
     it('should inform of an oscilation', () => {
       const result = compareRates(1000, 1000.2, 0.01);
       expect(result).toStrictEqual({
