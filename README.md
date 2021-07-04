@@ -12,7 +12,8 @@ From the `ticker-exercise` folder, run:
 npm install && npm run test
 ```
 
-## Run
+## Run using docker
+From the root folder, run:
 ```
 docker-compose up
 ```
