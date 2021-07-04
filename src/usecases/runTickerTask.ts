@@ -5,37 +5,68 @@ interface BuildRunTickerUsecaseParams {
   rateRepository: RateRepository;
 }
 
-// export function buildRunTickerUsecase(params: BuildRunTickerUsecaseParams) {
-//   const { rateRepository } = params;
-let firstBid: number;
-let lastPercentageChangeInformed: number = 0;
-
-export async function runTickerTask(apiUrl: string, token: string) {
-  const resRate = await getRates(apiUrl, token);
-  console.log(resRate);
-
-  firstBid = resRate.bid;
+export async function runTickerTask(
+  apiUrl: string,
+  token: string,
+  debugging: boolean
+) {
+  const firstRateResult = await getRates(apiUrl, token);
+  const firstRate = parseFloat(firstRateResult.bid);
+  let lastPercentageChangeInformed: number = 0;
 
   const recurringTask = setInterval(async () => {
-    const conversion = await getRates(apiUrl, token);
-    const currentBid = parseFloat(conversion.bid);
-
-    const percentageChange = ((currentBid - firstBid) * 100) / firstBid;
-    const differenceWithLastInformed =
-      percentageChange - lastPercentageChangeInformed;
-    if (Math.abs(differenceWithLastInformed) >= 0.01) {
-      console.log(
-        `Conversion rate alert. BTC price changed ${percentageChange} from start value`
-      );
-      lastPercentageChangeInformed = percentageChange;
-    } else {
-      console.log(`Not informing. Change rate was ${percentageChange}.`);
+    const { bid } = await getRates(apiUrl, token);
+    const currentRate = parseFloat(bid);
+    const compareResult = compareRates(
+      firstRate,
+      currentRate,
+      lastPercentageChangeInformed
+    );
+    if (compareResult.inform) {
+      lastPercentageChangeInformed = compareResult.differenceWithFirst;
     }
-    console.log(`Difference with last informed: ${differenceWithLastInformed}`);
-
-    console.log(conversion);
+    printResults(compareResult, debugging);
   }, 5000);
   return recurringTask;
+}
+
+type CompareResult = {
+  differenceWithFirst: number;
+  differenceWithLastInformed: number;
+  firstRate: number;
+  currentRate: number;
+  inform: boolean;
+};
+
+export function compareRates(
+  firstRate: number,
+  currentRate: number,
+  lastPercentageChangeInformed: number
+): CompareResult {
+  const differenceWithFirst = ((currentRate - firstRate) * 100) / firstRate;
+  const differenceWithLastInformed =
+    differenceWithFirst - lastPercentageChangeInformed;
+
+  return {
+    differenceWithFirst,
+    differenceWithLastInformed,
+    firstRate,
+    currentRate,
+    inform: Math.abs(differenceWithLastInformed) >= 0.01,
+  };
+}
+
+function printResults(compareResult: CompareResult, debugging: boolean) {
+  if (compareResult.inform) {
+    console.log(
+      `Conversion rate alert. BTC price changed ${compareResult.differenceWithFirst} from start value`
+    );
+  }
+  if (debugging) {
+    console.log(
+      `Not informing. Change rate since last informed was ${compareResult.differenceWithLastInformed}.`
+    );
+  }
 }
 
 export async function getRates(apiUrl: string, token: string) {
@@ -49,9 +80,3 @@ export async function getRates(apiUrl: string, token: string) {
   });
   return data.find((item: Rate) => item.pair === 'BTCUSD');
 }
-
-//  return {
-//    runTickerTask,
-//    getRates,
-//  };
-//}
