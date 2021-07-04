@@ -6,4 +6,5 @@ RUN npm install
 
 COPY . .
 RUN npm run build
-CMD npm start
+
+CMD sleep 60 && npm run migrate && npm start

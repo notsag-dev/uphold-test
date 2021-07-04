@@ -3,15 +3,6 @@ import knex from 'knex';
 let database: any;
 
 export function connectToDatabase() {
-  if (
-    process.env.POSTGRES_HOST === undefined ||
-    process.env.POSTGRES_USER === undefined ||
-    process.env.POSTGRES_PASSWORD === undefined ||
-    process.env.POSTGRES_DB === undefined
-  ) {
-    throw new Error('Please set database configs in .env file');
-  }
-
   database = knex({
     client: 'pg',
     connection: {
@@ -31,7 +22,7 @@ export function connectToDatabase() {
 
 export function getDatabase() {
   if (!database) {
-    throw new Error('No active connection to the database found');
+    database = connectToDatabase();
   }
   return database;
 }

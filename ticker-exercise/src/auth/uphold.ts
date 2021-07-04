@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-export async function getToken(
-  apiUrl: string,
-  clientId: string,
-  secret: string
-) {
+export async function getToken() {
+  const apiUrl = process.env.UPHOLD_API_URL || '';
+  const clientId = process.env.UPHOLD_API_CLIENT_ID || '';
+  const secret = process.env.UPHOLD_API_SECRET || '';
+
   const { data } = await axios({
     method: 'post',
     baseURL: apiUrl,

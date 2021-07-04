@@ -1,16 +1,16 @@
 version: "3.3"
 services:
   ticker-exercise:
-    container_name: ticker-exercise
+    container_name: ticker_exercise
     build:
       context: ticker-exercise
     depends_on:
       - database
 
   database:
-    image: postgres
+    image: postgres:13
     restart: always
-    container_name: pg_graph_recon
+    container_name: database_ticker_exercise
     volumes:
       - ./database/postgres-data:/var/lib/postgresql/data
     ports:

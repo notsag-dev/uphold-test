@@ -9,27 +9,50 @@ export type Rate = {
   id?: string;
   ask: string;
   bid: string;
-  currencty: string;
+  currency: string;
   pair: string;
   isInitial?: boolean;
 };
 
-export function builRunTickerUsecase(
+export interface RunTickerUsecase {
+  runTickerTask(
+    apiUrl: string,
+    token: string,
+    currency: string,
+    currencyPair: string,
+    debugging: boolean
+  ): Promise<ReturnType<typeof setInterval>>;
+}
+
+export function buildRunTickerUsecase(
   buildRunTickerUsecase: BuildRunTickerUsecaseParams
-) {
+): RunTickerUsecase {
   const { alertRepository } = buildRunTickerUsecase;
 
   async function runTickerTask(
     apiUrl: string,
     token: string,
+    currency: string,
+    currencyPair: string,
     debugging: boolean
-  ) {
-    const firstRateResult = await getRates(apiUrl, token);
+  ): Promise<ReturnType<typeof setInterval>> {
+    const firstRateResult = await getRateFromCurrencyAndPair(
+      apiUrl,
+      token,
+      currency,
+      currencyPair
+    );
     const firstRate = parseFloat(firstRateResult.bid);
     let lastPercentageChangeInformed: number = 0;
 
     const recurringTask = setInterval(async () => {
-      const { bid } = await getRates(apiUrl, token);
+      const { bid, pair } = await getRateFromCurrencyAndPair(
+        apiUrl,
+        token,
+        currency,
+        currencyPair
+      );
+
       const currentRate = parseFloat(bid);
       const compareResult = compareRates(
         firstRate,
@@ -38,23 +61,52 @@ export function builRunTickerUsecase(
       );
       if (compareResult.inform) {
         lastPercentageChangeInformed = compareResult.differenceWithFirst;
+        await alertRepository.create({
+          currency,
+          currencyPair: pair,
+          referenceRate: firstRate,
+          currentRate,
+          rateDifference: compareResult.differenceWithFirst,
+        });
       }
       printResults(compareResult, debugging);
     }, 5000);
     return recurringTask;
   }
+
+  return { runTickerTask };
 }
 
-export async function getRates(apiUrl: string, token: string) {
+export async function getRateFromCurrencyAndPair(
+  apiUrl: string,
+  token: string,
+  currency: string,
+  currencyPair: string
+): Promise<Rate> {
+  const rates = await getRates(apiUrl, token, currency);
+  const rate = rates.find((item: Rate) => item.pair === currencyPair);
+  if (rate === undefined) {
+    throw new Error(
+      `Error trying to find rate for currency ${currency} and ${currencyPair}`
+    );
+  }
+  return rate;
+}
+
+export async function getRates(
+  apiUrl: string,
+  token: string,
+  currency: string
+): Promise<Rate[]> {
   const { data } = await axios({
     method: 'get',
     baseURL: apiUrl,
-    url: '/v0/ticker/USD',
+    url: `/v0/ticker/${currency}`,
     headers: {
       Authentication: `bearer ${token}`,
     },
   });
-  return data.find((item: Rate) => item.pair === 'BTCUSD');
+  return data;
 }
 
 type RateCompareResult = {
