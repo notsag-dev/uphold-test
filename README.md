@@ -4,7 +4,7 @@
 Docker and Docker Compose have to be available in order to run the project.
 
 ## Set up the project
-In both folders `ticker-exercise` and `database` there is a file called `.env.example`. Please copy their contents into a file called `.env` in their respective folders. The one in `ticker-exercise` needs to be set an Uphold application api key and secret in order for it to work.
+In both `ticker-exercise` and `database` folders there is a file called `.env.example`. Please copy their contents into a file called `.env` in their respective folders. The one in `ticker-exercise` needs to be set an Uphold application api key and secret in order for it to work.
 
 ## Run
 ```
