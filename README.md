@@ -22,7 +22,7 @@ Notes:
 - If a rebuild of the Docker images and recreation of containers is needed, run `docker-compose up --build --force-recreate` instead.
 
 ## Run on host
-It is possible to run this project out of Docker but the database has to be set up manually. In this case Node 14 is needed.
+It is possible to run this project out of Docker but the database has to be set up manually. In this case, Node 14 is needed.
 
 After manually creating the db and updating the `.env` to match your db user's credentials, run:
 ```
