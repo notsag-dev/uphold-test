@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import { getToken } from './auth/uphold';
-import { connectToDatabase } from './adapters/database';
-import { runTickerTask } from './usecases/runTickerTask';
+//import { connectToDatabase } from './adapters/database';
+//import { runTickerTask } from './usecases/runTickerTask';
 
 dotenv.config({
   path: path.resolve(__dirname, '../.env'),
@@ -25,7 +25,7 @@ async function init() {
     process.env.UPHOLD_API_SECRET
   );
 
-  runTickerTask(process.env.UPHOLD_API_URL, token);
+  //runTickerTask(process.env.UPHOLD_API_URL, token);
 }
 
 init();
