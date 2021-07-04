@@ -27,6 +27,7 @@ It is possible to run this project out of Docker but the database has to be set 
 After manually creating the db and updating the `.env` to match your db user's credentials, run:
 ```
 npm install
+npm run build
 npm run migrate
 npm start
 ```
