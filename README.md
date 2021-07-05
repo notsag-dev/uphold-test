@@ -1,5 +1,14 @@
 # Uphold backend exercise
 
+## Summary
+From all the mandatory, secondary and bonus features detailed in the problem description, just one was not included in this solution due to lack of time: Handle multiple currency pair at the same time.
+
+If this bot was to be run in production, the following actions should be performed
+- Add more tests.
+- Comment code.
+- Enhance Docker configs (see more on this in the "Run using Docker" section).
+- Enhance error handling: there are several operations that should be handled in a better way. eg number parsing and db operations.
+
 ## Requirements
 Docker and Docker Compose have to be available in order to run the project.
 
@@ -12,7 +21,7 @@ From the `ticker-exercise` folder, run:
 npm install && npm run test
 ```
 
-## Run using docker
+## Run using Docker
 From the root folder, run:
 ```
 docker-compose up
