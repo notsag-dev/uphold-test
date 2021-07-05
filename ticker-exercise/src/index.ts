@@ -21,7 +21,7 @@ async function init(): Promise<void> {
 
   const debugging = process.env.DEBUGGING === '1';
 
-  console.log('Starting task ticker task...');
+  console.log('Starting ticker task...');
   runTickerTask(
     apiUrl,
     token,
