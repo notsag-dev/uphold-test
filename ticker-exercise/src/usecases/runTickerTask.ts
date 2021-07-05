@@ -20,6 +20,8 @@ export interface RunTickerUsecase {
     token: string,
     currency: string,
     currencyPair: string,
+    oscillationPercentage: number,
+    refreshTimeout: number,
     debugging: boolean
   ): Promise<ReturnType<typeof setInterval>>;
 }
@@ -34,6 +36,8 @@ export function buildRunTickerUsecase(
     token: string,
     currency: string,
     currencyPair: string,
+    oscillationPercentage: number,
+    refreshTimeout: number,
     debugging: boolean
   ): Promise<ReturnType<typeof setInterval>> {
     const firstRateResult = await getRateFromCurrencyAndPair(
@@ -57,7 +61,8 @@ export function buildRunTickerUsecase(
       const compareResult = compareRates(
         firstRate,
         currentRate,
-        lastPercentageChangeInformed
+        lastPercentageChangeInformed,
+        oscillationPercentage
       );
       if (compareResult.inform) {
         lastPercentageChangeInformed = compareResult.differenceWithFirst;
@@ -70,7 +75,7 @@ export function buildRunTickerUsecase(
         });
       }
       printResults(compareResult, currency, currencyPair, debugging);
-    }, 5000);
+    }, refreshTimeout);
     return recurringTask;
   }
 
@@ -120,7 +125,8 @@ type RateCompareResult = {
 export function compareRates(
   firstRate: number,
   currentRate: number,
-  lastPercentageChangeInformed: number
+  lastPercentageChangeInformed: number,
+  oscillationPercentage: number
 ): RateCompareResult {
   const differenceWithFirst = ((currentRate - firstRate) * 100) / firstRate;
   const differenceWithFirstFixed = +differenceWithFirst.toFixed(5);
@@ -128,7 +134,7 @@ export function compareRates(
     differenceWithFirst - lastPercentageChangeInformed;
   const differenceWithLastInformedFixed =
     +differenceWithLastInformed.toFixed(5);
-  const inform = Math.abs(differenceWithLastInformed) >= 0.01;
+  const inform = Math.abs(differenceWithLastInformed) >= oscillationPercentage;
 
   return {
     firstRate,

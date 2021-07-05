@@ -9,13 +9,29 @@ dotenv.config({
   path: path.resolve(__dirname, '../.env'),
 });
 
-function sleep(ms: number) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+async function init(): Promise<void> {
+  initDb();
+  const { token, apiUrl } = await initUphold();
+
+  const alertRepository = buildAlertRepository({ getDatabase });
+  const { runTickerTask } = buildRunTickerUsecase({ alertRepository });
+
+  const { oscillationPercentage, refreshTimeout, currency, currencyPair } =
+    getBotParams();
+
+  console.log('Starting task ticker task...');
+  runTickerTask(
+    apiUrl,
+    token,
+    currency,
+    currencyPair,
+    oscillationPercentage,
+    refreshTimeout,
+    true
+  );
 }
 
-async function init(): Promise<void> {
+function initDb() {
   if (
     process.env.POSTGRES_HOST === undefined ||
     process.env.POSTGRES_USER === undefined ||
@@ -24,18 +40,13 @@ async function init(): Promise<void> {
   ) {
     throw new Error('Please set database configs in .env file');
   }
-  console.log('Connecting to the database...');
-  let connected = false;
-  while (!connected) {
-    try {
-      connectToDatabase();
-      connected = true;
-    } catch (err) {
-      console.log('Database not ready, retrying...');
-    }
-  }
-  console.log('Successfully connected to the database.');
 
+  console.log('Connecting to the database...');
+  connectToDatabase();
+  console.log('Successfully connected to the database.');
+}
+
+async function initUphold() {
   if (
     process.env.UPHOLD_API_URL === undefined ||
     process.env.UPHOLD_API_CLIENT_ID === undefined ||
@@ -43,14 +54,25 @@ async function init(): Promise<void> {
   ) {
     throw new Error('Please set uphold configs in .env file');
   }
+
   console.log('Requesting Uphold token...');
   const token = await getUpholdToken();
   console.log('Successfully obtained Uphold token');
 
-  console.log('Starting task ticker task...');
-  const alertRepository = buildAlertRepository({ getDatabase });
-  const { runTickerTask } = buildRunTickerUsecase({ alertRepository });
-  runTickerTask(process.env.UPHOLD_API_URL, token, 'USD', 'BTCUSD', true);
+  return { token, apiUrl: process.env.UPHOLD_API_URL };
+}
+
+function getBotParams() {
+  const oscillationPercentage = process.env.TICKER_ALERT_OSCILLATION_PERCENTAGE
+    ? parseFloat(process.env.TICKER_ALERT_OSCILLATION_PERCENTAGE)
+    : 0.01;
+  const refreshTimeout = process.env.TICKER_FETCH_INTERVAL_MILLISECONDS
+    ? parseInt(process.env.TICKER_FETCH_INTERVAL_MILLISECONDS)
+    : 5000;
+  const currency = process.env.CURRENCY || 'USD';
+  const currencyPair = process.env.CURRENCY_PAIR || 'BTCUSD';
+
+  return { oscillationPercentage, refreshTimeout, currency, currencyPair };
 }
 
 init();
