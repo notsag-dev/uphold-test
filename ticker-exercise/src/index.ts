@@ -19,6 +19,8 @@ async function init(): Promise<void> {
   const { oscillationPercentage, refreshTimeout, currency, currencyPair } =
     getBotParams();
 
+  const debugging = process.env.DEBUGGING === '1';
+
   console.log('Starting task ticker task...');
   runTickerTask(
     apiUrl,
@@ -27,7 +29,7 @@ async function init(): Promise<void> {
     currencyPair,
     oscillationPercentage,
     refreshTimeout,
-    true
+    debugging
   );
 }
 
@@ -57,7 +59,7 @@ async function initUphold() {
 
   console.log('Requesting Uphold token...');
   const token = await getUpholdToken();
-  console.log('Successfully obtained Uphold token');
+  console.log('Successfully obtained Uphold token.');
 
   return { token, apiUrl: process.env.UPHOLD_API_URL };
 }
