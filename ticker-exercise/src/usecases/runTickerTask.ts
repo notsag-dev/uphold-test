@@ -6,7 +6,6 @@ interface BuildRunTickerUsecaseParams {
 }
 
 export type Rate = {
-  id?: string;
   ask: string;
   bid: string;
   currency: string;
