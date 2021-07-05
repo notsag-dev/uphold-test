@@ -8,7 +8,7 @@ If this bot was to be run in production, the following actions should be perform
 - Comment code.
 - Enhance Docker configs (see more on this in the "Run using Docker" section).
 - Enhance error handling: There are several operations that should be handled in a better way. eg number parsing and db operations.
-- Improve typing: There are some missing types that could be added, some in the main index file for example.
+- Improve typing: There are some missing types that could be added, some function result types in the main index file for example.
 
 ## Requirements
 Docker and Docker Compose have to be available in order to run the project.
