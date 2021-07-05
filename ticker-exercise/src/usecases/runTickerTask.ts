@@ -10,7 +10,6 @@ export type Rate = {
   bid: string;
   currency: string;
   pair: string;
-  isInitial?: boolean;
 };
 
 export interface RunTickerUsecase {
