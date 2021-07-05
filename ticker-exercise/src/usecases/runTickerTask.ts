@@ -132,7 +132,8 @@ export function compareRates(
     differenceWithFirst - lastPercentageChangeInformed;
   const differenceWithLastInformedFixed =
     +differenceWithLastInformed.toFixed(5);
-  const inform = Math.abs(differenceWithLastInformed) >= oscillationPercentage;
+  const inform =
+    Math.abs(differenceWithLastInformedFixed) >= oscillationPercentage;
 
   return {
     firstRate,
