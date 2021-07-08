@@ -23,9 +23,9 @@ export function buildAlertRepository(
 ): AlertRepository {
   const { getDatabase } = params;
 
-  async function create(r: Alert) {
+  async function create(a: Alert) {
     const db = await getDatabase();
-    await db(tableName).insert(r);
+    await db(tableName).insert(a);
   }
 
   async function get(id: string) {
